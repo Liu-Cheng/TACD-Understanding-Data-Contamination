@@ -1,0 +1,7 @@
+\section{Future Work}
+
+Several aspects of this work warrant further investigation.
+
+First, although our detector effectively identifies contaminated samples within benchmarks, the question of how to reliably evaluate model performance using a partially contaminated benchmark remains unaddressed. Future work may explore mitigation strategies that enable fair and accurate assessment despite the presence of a certain proportion of contaminated samples.
+
+Second, the current detection framework primarily targets exact and near-exact copies of benchmark samples in training data. However, contamination may also take more subtle forms — for instance, when the same functionality is implemented with different variable names, reordered statements, or alternative control-flow structures. Extending the detection framework to cover such semantically equivalent yet syntactically diverse variants is a direction that warrants further exploration.

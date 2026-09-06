@@ -1,0 +1,56 @@
+\section{Related Work}
+Data contamination occurs when evaluation samples, or sufficiently similar variants, are included in the data used to train a model. It can cause benchmark performance to reflect memorization rather than generalization and has therefore become a central concern in LLM evaluation. Prior studies have emphasized the need to assess contamination separately for each benchmark, documented leakage and evaluation malpractice in closed-source LLM studies, and identified widespread benchmark exposure across model families and reasoning tasks~\cite{sainz2023nlp,balloccu2024leak,xu2024benchmarking}. These findings establish data contamination as a general evaluation problem, but they provide limited evidence about hardware-description languages, whose highly structured syntax and scarce public data create a distinct setting.
+
+Existing detection techniques typically cast contamination detection as membership inference. Given an evaluation sample, they estimate whether the target model encountered it during training. When only generated outputs are available, membership can be inferred by prompting the model to reproduce part of a sample, comparing the completion with the reference text, testing response consistency under different prompts, or measuring similarity in an embedding space~\cite{golchin2024time,golchin2025data,he2025towards,dong2024generalization}. Such techniques are applicable to models exposed only through an inference interface, but their scores can also reflect task difficulty, semantic regularity, or a model's general generation ability. This ambiguity is particularly pronounced for Verilog, where different implementations may realize the same circuit while common RTL templates can make unseen code appear familiar.
+
+When token-level probabilities are available, detection can exploit finer-grained signals. Sequence loss and perplexity measure how confidently a model predicts an entire sample, whereas low-probability token statistics focus on the least expected parts of the sequence~\cite{li2309estimating,shi2024detecting,zhang2025min}. Other approaches calibrate likelihoods against a reference distribution, combine model confidence with compressibility, or compare a sample with perturbed neighbors~\cite{zhang2024pretraining,carlini2021extracting,mattern2023membership}. Although these signals capture complementary aspects of memorization, none is universally reliable. Large-scale evaluations have shown that membership inference methods may approach random guessing and can be highly sensitive to distribution shifts between member and non-member data~\cite{duan2024membership}. Applying fixed thresholds across Verilog-generation models further compounds this problem because model families and tokenizers produce substantially different score distributions.
+
+Most prior contamination detectors use one such signal in isolation. A closely related exception is EM-MIAs, which feeds loss-, reference-, Min-K-, and compression-based membership scores into an XGBoost classifier and improves both AUC-ROC and accuracy over its constituent attacks on general-text datasets~\cite{song2025mias}. This result demonstrates the potential of learning complementary relationships among contamination signals. However, EM-MIAs is designed for general-text privacy auditing and does not study structurally constrained RTL, the interaction between natural-language specifications and Verilog implementations, or score shifts across Verilog-generation models. It therefore remains unclear whether a learned ensemble transfers to this domain. Our work addresses this gap by constructing Verilog-specific datasets with known membership labels, systematically measuring the reliability of heterogeneous detection signals, and learning a boosting-based detector for contamination analysis across Verilog-generation models and benchmarks.
+
+
+
+% % 2.1 Data Contamination in Large Language Models
+% \subsection{Data Contamination in Large Language Models}
+% Recently, data contamination in large language models has attracted widespread attention, as such contamination can lead to misjudgment of model capabilities. 
+% Sainz et al. pointed out that the likelihood of data contamination is high during the pre‑training phase, while it is relatively lower during the supervised fine‑tuning or instruction‑tuning stages~\cite{sainz2023nlp}. 
+% Balloccu et al. found that 42\% of papers evaluating models such as GPT‑3.5 and GPT‑4 contained leaked data, affecting millions of instances~\cite{balloccu2024leak}. 
+% Xu et al. analyzed 31 LLMs in the context of mathematical reasoning, uncovering widespread data contamination~\cite{xu2024benchmarking}. 
+% These studies indicate that data contamination in large language models is a widespread and serious problem.
+
+% % 2.2 Existing Probes for Contamination Detection
+% \subsection{Existing Probes for Contamination Detection}
+% %mink mink++ dcpdd ppl zlib petal neighbor wpq token_overlap cdd reference分类别说明
+% In this work, we consider two categories of data contamination detection methods based on the level of model access
+%   required:
+%   \begin{itemize}
+%       \item \textbf{Black-box methods} operate solely on model outputs without access to internal parameters or
+%   token-level logits. We adopt four black-box probes: Token Overlap~\cite{golchin2024time}, which measures textual similarity between
+%   model-generated completions and original evaluation samples; Data Contamination Quiz~\cite{golchin2025data}, which compares model responses under
+%   different prompt configurations; PETAL~\cite{he2025towards}, which exploits embedding-space similarity between generated code and
+%   reference corpora; and CDD~\cite{dong2024generalization}, which analyzes lexical and syntactic distribution patterns in generated sequences.
+%       \item \textbf{Gray-box methods} leverage access to token-level logit outputs from the target model, enabling
+%   finer-grained membership inference. We employ seven gray-box probes: Min-k\%~\cite{shi2024detecting} and Min-k\%++~\cite{zhang2025min}, which operate on
+%    per-token probability statistics; DCPDD~\cite{zhang2024pretraining} and PPL~\cite{li2309estimating}, which derive membership signals from sequence-level
+%   likelihood; Zlib~\cite{carlini2021extracting}, which combines model probabilities with compression-based information measures;
+%   Reference~\cite{}, which compares generated outputs against known reference implementations using logit-derived
+%   confidence; and Neighbor~\cite{mattern2023membership}, which measures perturbation sensitivity through logit distribution shifts.
+%   \end{itemize}
+
+
+
+% % 2.3 Verilog Benchmarks and Their Leakage Risks
+% \subsection{Verilog Benchmarks and Their Leakage Risks}
+% %目前在Verilog领域常用的几个benchmark 根据一些论文 它们有一定的泄露风险
+% VerilogEval~\cite{liu2023verilogeval}, RTLLM~\cite{lu2024rtllm}, and RealBench~\cite{jin2025realbench} are existing evaluation benchmarks for assessing the Verilog generation capability of llms. According to~\cite{sainz2023nlp}~\cite{balloccu2024leak}~\cite{xu2024benchmarking} , there exists a certain leakage problem in current benchmarks during LLM training.
+
+
+
+
+
+
+
+% % 2.4 Ensemble Learning in Related Detection Tasks
+% \subsection{Ensemble Learning in Related Detection Tasks}
+% ~\cite{song2025mias} proposes a novel ensemble attack method that integrates several existing MIAs techniques into an XGBoost-based model to enhance overall attack performance,and Experimental results demonstrate that the ensemble
+% model significantly improves both AUC-ROC and accuracy compared to individual attack methods across various large language models and datasets.This has provided inspiration for our exploration of data leakage in large language models on Verilog benchmarks.
+

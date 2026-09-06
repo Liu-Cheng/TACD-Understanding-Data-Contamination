@@ -1,0 +1,85 @@
+\documentclass[journal]{IEEEtran}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{textcomp}
+\usepackage{bm}
+\usepackage{graphicx}       
+\usepackage{xcolor}        
+\usepackage{subfig}         
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{booktabs}      
+\usepackage{makecell}
+\usepackage{algorithm}
+\usepackage{algorithmic}    
+\usepackage{setspace}
+\usepackage{verbatim}
+\usepackage{cite}          
+\newtheorem{lemma}{Lemma}
+\newtheorem{proof}{Proof}
+\hyphenation{}
+\usepackage{hyperref}       
+\usepackage[normalem]{ulem}   
+\usepackage{tabularx}
+
+
+
+\begin{document}
+\title{Understanding Data Contamination in Verilog-Generation LLMs}
+
+\author{Xiuyu Hu, \IEEEmembership{Student Member,~IEEE,}
+        Jiazheng Zhang,
+        Shengwen Liang,
+        Long Cheng, \IEEEmembership{Member,~IEEE,}
+        Huawei Li, \IEEEmembership{Senior Member,~IEEE,}
+        Cheng Liu, \IEEEmembership{Senior Member,~IEEE}
+\thanks{(\textit{Corresponding author: Cheng Liu}.)}
+\thanks{This work was supported in part by the Strategic Priority Research Program of the Chinese Academy of Sciences, Grant No. XDB0660103, and the National Natural Science Foundation of China under Grant No. 62174162.}
+\thanks{Xiuyu Hu is with the Hangzhou Institute for Advanced Study, University of Chinese Academy of Sciences, Hangzhou 310024, China, and also with the State Key Laboratory of Processors, Institute of Computing Technology, Chinese Academy of Sciences, Beijing 100190, China, and the Department of Computer Science and Technology, University of Chinese Academy of Sciences, Beijing 100190, China (e-mail: huxiuyu25@mails.ucas.ac.cn).}
+\thanks{Jiazheng Zhang, Shengwen Liang, and Huawei Li are with the State Key Laboratory of Processors, Institute of Computing Technology, Chinese Academy of Sciences, Beijing 100190, China, and also with the Department of Computer Science and Technology, University of Chinese Academy of Sciences, Beijing 100190, China (e-mail: zhangjiazheng24s@ict.ac.cn; liangshengwen@ict.ac.cn; lihuawei@ict.ac.cn).}
+\thanks{Long Cheng and Cheng Liu are with the School of Control and Computer Engineering, North China Electric Power University, Beijing 102206, China (e-mail: lcheng@ncepu.edu.cn; liucheng@ncepu.edu.cn).}
+}
+
+% The paper headers
+\markboth{IEEE Transactions on Computer-aided Design of Integrated Circuits and Systems, ~Vol.~xx, No.~xx, xxx~2023}%
+{Xiuyu Hu  \MakeLowercase{\textit{et al.}}: Bare Demo of IEEEtran.cls for IEEE Journals}
+
+\maketitle
+
+\begin{abstract}
+
+Large language models (LLMs) for Verilog generation frequently report functional-correctness rates above 95\% on widely used benchmarks. However, such results do not consistently translate into effectiveness on practical RTL designs, making it difficult for current evaluations to faithfully measure and guide progress in Verilog generation. Data contamination is a critical concern in this setting. Publicly available hardware-design data are scarce, and many RTL benchmarks aggregate examples from public Internet sources. Because LLM pretraining and fine-tuning data are often collected from the same limited data ecosystem, training and evaluation sets have a high risk of overlap, potentially inflating reported performance.
+We systematically evaluate ten representative detectors and find that they yield highly inconsistent contamination estimates for the same model--benchmark pairs. To improve reliability, we construct controlled datasets with known membership labels and develop a boosting-based detector that integrates complementary signals from existing methods, achieving an average AUC of 0.9208 and outperforming individual detectors. We then apply the detector to representative Verilog-generation LLMs and standard RTL benchmarks, revealing substantial estimated contamination rates of approximately 40\%--70\%. These results suggest that current benchmark scores may overestimate model generalization and underscore the need for contamination-aware evaluation protocols that more accurately guide the development of Verilog-generation LLMs.
+
+\end{abstract}
+
+\begin{IEEEkeywords}
+Data Contamination, Verilog Generation, Code-Generation LLMs, LLM Evaluation
+\end{IEEEkeywords}
+
+% For peer review papers, you can put extra information on the cover
+% page as needed:
+% \ifCLASSOPTIONpeerreview
+% \begin{center} \bfseries EDICS Category: 3-BBND \end{center}
+% \fi
+%
+% For peerreview papers, this IEEEtran command inserts a page break and
+% creates the second title. It will be ignored for other modes.
+\IEEEpeerreviewmaketitle
+
+
+\input{intro}
+\input{related}
+\input{detection}
+\input{evaluation}
+\input{future}
+\input{conclusion}
+
+\bibliographystyle{IEEEtran}
+\bibliography{cite}
+
+
+
+\end{document}
+
+
