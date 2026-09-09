@@ -75,6 +75,38 @@ For the ensemble, the decision threshold \(\tau^*\) is selected by five-fold str
 
 We evaluate the ensemble in two settings: RTL-generation variants derived from the shared foundation model DeepSeek-Coder-v1.5, and additional RTL-generation models based on CodeLlama, CodeQwen, and Qwen. Together, these experiments assess the improvement in contamination detection and the transferability of the learned detector across target models.
 
+% Queue Table IV early to keep it near the model--benchmark analysis.
+\begin{table*}[!t]
+\centering
+\caption{Estimated contamination rates (\%) for code-generation model--RTL benchmark pairs. Each entry is the percentage of benchmark samples flagged by the CatBoost ensemble as potentially present in the corresponding model's training data.}
+\label{tab:benchmark_detection}
+\small
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}l*{6}{r}r}
+\toprule
+& \multicolumn{2}{c}{\textbf{VerilogEval}} & \multicolumn{2}{c}{\textbf{RTLLM}} & \multicolumn{2}{c}{\textbf{RealBench}} & \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}
+\textbf{Model} & v1 & v2 & v1 & v2 & mod & sys & \textbf{W. Avg} \\
+\midrule
+\multicolumn{8}{c}{\textit{General-Purpose Code Models}} \\
+\cmidrule{1-8}
+CodeGen-6B-Multi    & 0.6  & 0.0  & 0.0  & 0.0  & 0.0  & 0.0  & 0.2 \\
+Phi-2               & 9.0  & 8.3  & 0.0  & 2.0  & 0.0  & 0.0  & 6.2 \\
+DeepSeek-Coder-6.7B & 89.7 & 78.2 & \uline{82.8} & \uline{84.0} & 18.3 & 0.0  & 74.5 \\
+Qwen2.5-Coder       & 80.8 & 53.8 & 55.2 & 58.0 & 16.7 & 0.0  & 58.2 \\
+\midrule
+\multicolumn{8}{c}{\textit{Verilog-Fine-tuned Models}} \\
+\cmidrule{1-8}
+ChipGPT             & 57.7 & 40.4 & 44.8 & 42.0 & 3.3  & 0.0  & 41.5 \\
+RTLCoder            & \textbf{97.4} & \textbf{93.0} & \textbf{86.2} & \textbf{88.0} & \textbf{30.0} & 0.0  & \textbf{84.4} \\
+OriGen              & 69.2 & 53.8 & 65.5 & 72.0 & 18.3 & 0.0  & 56.7 \\
+VeriCoder           & 90.4 & 62.8 & 69.0 & 70.0 & 18.3 & 0.0  & 67.0 \\
+VeriGen             & \uline{94.2} & \uline{91.0} & 62.1 & 74.0 & \uline{25.0} & \textbf{25.0} & \uline{79.1} \\
+\midrule
+\textbf{Benchmark Avg} & \textbf{65.4} & 53.5 & 51.7 & \uline{54.4} & 14.4 & 2.8 & 52.0 \\
+\bottomrule
+\end{tabular*}
+\end{table*}
+
 \subsubsection{Detection on DeepSeek-Coder-v1.5 Variants}
 
 Table~\ref{tab:compare_baseline} compares the ten individual detectors with our CatBoost ensemble on CodeV, RTLCoder, and OriGen, all derived from DeepSeek-Coder-v1.5. The ensemble is trained on the training splits of CodeV and OriGen and evaluated on the separate golden test sets of all three models. RTLCoder contributes no samples to ensemble training, allowing us to assess transfer to another RTL-generation variant of the same foundation model.
@@ -110,36 +142,6 @@ On VerilogEval v1, the estimates for RTLCoder and ChipGPT differ by 39.7 percent
 
 These findings motivate reporting contamination alongside generation performance for each model--benchmark pair. A useful next evaluation is to separate flagged and unflagged samples while accounting for task difficulty and the number of remaining samples. Since each model may have encountered different examples, filtering each model's test set independently can itself distort comparisons; a common audited subset or newly sourced tasks would provide a stronger basis for comparing generalization. The practical implication is that progress in RTL generation should be assessed jointly with training-data exposure, rather than inferred from benchmark pass rates alone.
 
-\begin{table*}[t]
-\centering
-\caption{Estimated contamination rates (\%) for code-generation model--RTL benchmark pairs. Each entry is the percentage of benchmark samples flagged by the CatBoost ensemble as potentially present in the corresponding model's training data.}
-\label{tab:benchmark_detection}
-\small
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}l*{6}{r}r}
-\toprule
-& \multicolumn{2}{c}{\textbf{VerilogEval}} & \multicolumn{2}{c}{\textbf{RTLLM}} & \multicolumn{2}{c}{\textbf{RealBench}} & \\
-\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}
-\textbf{Model} & v1 & v2 & v1 & v2 & mod & sys & \textbf{W. Avg} \\
-\midrule
-\multicolumn{8}{c}{\textit{General-Purpose Code Models}} \\
-\cmidrule{1-8}
-CodeGen-6B-Multi    & 0.6  & 0.0  & 0.0  & 0.0  & 0.0  & 0.0  & 0.2 \\
-Phi-2               & 9.0  & 8.3  & 0.0  & 2.0  & 0.0  & 0.0  & 6.2 \\
-DeepSeek-Coder-6.7B & 89.7 & 78.2 & \uline{82.8} & \uline{84.0} & 18.3 & 0.0  & 74.5 \\
-Qwen2.5-Coder       & 80.8 & 53.8 & 55.2 & 58.0 & 16.7 & 0.0  & 58.2 \\
-\midrule
-\multicolumn{8}{c}{\textit{Verilog-Fine-tuned Models}} \\
-\cmidrule{1-8}
-ChipGPT             & 57.7 & 40.4 & 44.8 & 42.0 & 3.3  & 0.0  & 41.5 \\
-RTLCoder            & \textbf{97.4} & \textbf{93.0} & \textbf{86.2} & \textbf{88.0} & \textbf{30.0} & 0.0  & \textbf{84.4} \\
-OriGen              & 69.2 & 53.8 & 65.5 & 72.0 & 18.3 & 0.0  & 56.7 \\
-VeriCoder           & 90.4 & 62.8 & 69.0 & 70.0 & 18.3 & 0.0  & 67.0 \\
-VeriGen             & \uline{94.2} & \uline{91.0} & 62.1 & 74.0 & \uline{25.0} & \textbf{25.0} & \uline{79.1} \\
-\midrule
-\textbf{Benchmark Avg} & \textbf{65.4} & 53.5 & 51.7 & \uline{54.4} & 14.4 & 2.8 & 52.0 \\
-\bottomrule
-\end{tabular*}
-\end{table*} 
 
 
 
@@ -148,12 +150,13 @@ VeriGen             & \uline{94.2} & \uline{91.0} & 62.1 & 74.0 & \uline{25.0} &
 
 
 
-\subsection{Ablation Studies}
+
+\subsection{Ensemble Training Strategy and Configuration Analysis}
 \label{sec:ablation}
 
 \begin{table*}[t]
 \centering
-\caption{Ablation study of boosting algorithms.}
+\caption{Effect of the boosting algorithm on ensemble detection performance. AUC-ROC and F1 are reported for CatBoost, XGBoost, and LightGBM.}
 \label{tab:boosting_algorithms}
 \small
 \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}l*{8}{c}}
@@ -172,54 +175,42 @@ CatBoost & \uline{0.917} & \textbf{0.859} & \textbf{0.912} & \textbf{0.859} & \t
 \begin{figure*}[t]  % t=顶部, b=底部, p=单独一页, h=此处
     \centering
     \includegraphics[width=0.9\textwidth]{figures/fig_greedy_forward.pdf}
-    \caption{Greedy Forward Selection}
+    \caption{Effect of cumulatively adding detector scores to the ensemble. The star marks the adopted five-detector configuration; curves report AUC on each golden test set and their average.}
     \label{fig:greedy}
 \end{figure*}
 
-To understand the contribution of each design choice, we conduct three ablation experiments: (1) choice of boosting algorithm, (2) method subset selection, and (3) training source and data size.
+We examine how the ensemble's training strategy and configuration affect detection quality and transfer across models. The analysis covers the boosting algorithm, the detector scores used as input features, and the sources and quantity of labeled training data. Unless varied, the reference configuration uses CatBoost with 900 iterations, a maximum tree depth of 6, and a learning rate of 0.03, trained on CodeV and OriGen with the five detector scores specified in Section~\ref{sec:catboost}. These boosting and tree settings are held fixed; the experiments below assess configuration choices rather than a search over all training hyperparameters.
 
 \subsubsection{Choice of Boosting Algorithm}
 \label{sec:choice}
 
-Table~\ref{tab:boosting_algorithms} compares the performance of CatBoost, XGBoost, and LightGBM. CatBoost achieves the highest average AUC at 0.927, marginally ahead of XGBoost at 0.924, and delivers the highest average F1 at 0.872, showing a more substantial advantage over XGBoost at 0.859. LightGBM trails on both metrics, with an average AUC of 0.914 and an average F1 of 0.857. While XGBoost yields a slightly higher AUC on test set of CodeV , CatBoost demonstrates superior performance on the two remaining test sets and, more importantly, achieves substantially higher F1 scores across all three test sets, indicating better binary classification performance at the deployed threshold. Notably, on RTLCoder, the unseen black-box target model i.e. CatBoost outperforms XGBoost in both AUC and F1, a gap we attribute to CatBoost's ordered target encoding, which eliminates prediction shift and yields more calibrated probability estimates on out-of-distribution data. In contrast, XGBoost's standard target encoding tends to overfit source-domain patterns, resulting in relatively weaker generalization to unseen targets. LightGBM consistently underperforms relative to both CatBoost and XGBoost across the majority of metrics and test sets. Based on these results, we adopt CatBoost as our default ensemble algorithm accordingly.
+Table~\ref{tab:boosting_algorithms} compares CatBoost, XGBoost, and LightGBM. CatBoost achieves the highest average AUC (0.927) and F1 (0.872), compared with 0.924 and 0.859 for XGBoost and 0.914 and 0.857 for LightGBM. The AUC advantage over XGBoost is modest, while the F1 difference is larger, indicating that the choice of boosting algorithm affects binary decisions as well as score ranking. XGBoost slightly outperforms CatBoost in AUC on CodeV (0.922 versus 0.917), but CatBoost yields higher F1 on all three models and higher AUC on RTLCoder and OriGen. On RTLCoder, whose data are excluded from the reference training configuration, CatBoost improves over XGBoost by 0.005 in AUC and 0.015 in F1. These results support CatBoost as the default implementation for its balance of average detection quality and performance across targets. The comparison does not isolate the contribution of individual algorithmic mechanisms, so it does not establish that target encoding or probability calibration causes the observed differences.
 
-
-\subsubsection{Method Subset Selection}
+\subsubsection{Selection of Detector Features}
 \label{sec:select}
+
+Figure~\ref{fig:greedy} examines the cumulative addition of detector scores, starting with DC-PDD, the strongest individual baseline by average AUC in Table~\ref{tab:compare_baseline}. Adding Reference, Neighborhood, Min-K\%, and Zlib raises the ensemble's average AUC from 0.846 to 0.927. The improvement shows that a detector's value as an ensemble feature is not determined solely by its standalone accuracy: methods with weaker individual results can contribute information that complements the existing features.
+
+Including more scores does not uniformly improve performance. The average AUC decreases to 0.926, 0.925, and 0.923 after adding Perplexity, PETAL, and CDD. Adding Min-K\%++ then produces the highest average, 0.930, but this aggregate conceals a decline on RTLCoder from 0.901 to 0.871, alongside gains on CodeV and OriGen. Thus, optimizing the mean alone can favor a combination that performs better on models represented in training while transferring less well to another model. The adopted five-detector configuration trades a small difference in mean AUC for a higher RTLCoder AUC of 0.912 and fewer required detector scores. The later additions are consistent with redundancy or source-specific feature relationships, although this study does not distinguish those explanations. We therefore regard the five-feature set as a practical configuration supported by the observed tradeoff, rather than a universal optimum.
+
+\subsubsection{Composition of Training Sources}
+\label{sec:source}
 
 \begin{figure*}[t]  % t=顶部, b=底部, p=单独一页, h=此处
     \centering
     \includegraphics[width=\textwidth]{figures/fig_train_size.pdf}
-    \caption{The Composition and Size of the Training Set}
+    \caption{Effect of training-source composition and sample size on ensemble AUC. The horizontal axis gives the number of samples per class from each included source model; a configuration with $m$ sources therefore contains $2m t_c$ training samples.}
     \label{fig:train_size}
 \end{figure*}
 
+Figure~\ref{fig:train_size} compares all seven nonempty combinations of CodeV, RTLCoder, and OriGen as training sources. We denote the number of training samples per class from each included source by \(t_c\), varied from 50 to 400. With balanced positive and negative classes, a configuration containing \(m\) sources uses \(2m t_c\) samples. At a fixed \(t_c\), adding sources therefore changes both the diversity and the total quantity of training data.
 
-We begin with DC-PDD, which achieves the highest average AUC among all individual baselines in Section~\ref{sec:comparison}, and iteratively add the method that yields the largest increase in average AUC across the three test sets. Figure~\ref{fig:greedy} visualizes the trajectory of this selection process. The average AUC improves steadily from 0.846 with DC-PDD alone, reaching a peak of 0.927 when Zlib is added as the fifth method. This optimal combination comprises DC-PDD, Reference, Neighborhood, Min-K\%, and Zlib. Beyond this point, further additions yield diminishing or even negative returns: adding Perplexity, PETAL, and CDD gradually lowers the average AUC, and while including Min-K\%++ temporarily raises the average to 0.930, this gain is most pronounced on the CodeV (0.949) and OriGen (0.970) test sets, whereas RTLCoder collapses sharply from 0.901 to 0.871. This divergence, where improvements on source-related models come at the cost of severe degradation on the unseen target, indicates that these additional methods encode signals tightly coupled with the source model architecture and introduce distributional noise that actively harms generalization to black-box target models. This five-method combination therefore strikes the optimal balance between discriminative power and cross-model stability, and is adopted as our optimal feature set.
+The CodeV+OriGen combination is among the strongest configurations across the tested sizes and reaches an average AUC of 0.927 at \(t_c=400\). It also achieves an AUC of 0.912 on RTLCoder without using RTLCoder training samples. The individual-model curves show why average performance matters: a source combination can improve performance on one model without improving the others equally. For example, including RTLCoder training data benefits its corresponding test set, but does not necessarily yield the best average across all three models. Adding RTLCoder to CodeV+OriGen provides little change in the final average AUC despite increasing the training sample count from 1,600 to 2,400. For the evaluated setting, two complementary sources therefore provide a useful balance between coverage and training-data requirements.
 
-\subsubsection{The Composition and Size of the Training Set }
-\label{sec:source}
+\subsubsection{Size of the Training Set}
+\label{sec:train_size_analysis}
 
-
-
-We investigate how the composition and size of the training set affect detection performance. Figure~\ref{fig:train_size} reports the AUC on each test set as a function of training data size defined as the number of samples provided by each training set per class, denoted as \(tc\) across seven training set configurations.
-
-For most training set configurations, the average AUC exhibits a general upward trend as \(tc\) increases from 50 to 400, with the most substantial gains occurring in the low-data regime (\(tc \leq 200\)). However, the trend is not monotonic across all configurations: for the OriGen-only training set and the CodeV+RTLCoder training set, the average AUC declines slightly when \(tc\) increases from 350 to 400. On individual test sets, performance fluctuates across data sizes, indicating that larger training data does not guarantee improvement on every target model. Notably, the CodeV+OriGen training set achieves the highest average AUC of 0.927 at \(tc=400\). With only 100 samples per class, the CodeV+OriGen training set already achieves an average AUC of 0.900, surpassing all single-source training sets at their full data volume and underscoring the data efficiency of cross-model training.
-
-Among all configurations, the CodeV+OriGen training set achieves the best average performance across most data sizes, outperforming all single-source and dual-source alternatives, while performing on par with the three-source configuration (CodeV+RTLCoder+OriGen). Critically, the CodeV+OriGen training set also demonstrates strong generalization to the unseen black-box target model RTLCoder, achieving an AUC of 0.912 at \(tc=400\), confirming its effectiveness in the cross-model detection scenario. Notably, adding a third training set (CodeV+RTLCoder+OriGen) yields almost identical average AUC compared to CodeV+OriGen, indicating that increasing the number of training sets does not necessarily enhance performance. Given its superior performance and validated cross-model detection effectiveness, we adopt CodeV+OriGen as the optimal training set composition.
-
-
-
-
-
-
-
-
-
-
-
-
-
+Within a fixed source configuration, larger \(t_c\) generally improves average AUC, with diminishing gains as more samples are included. The trend is not strictly monotonic: some configurations fluctuate or decline at the largest size, showing that more labeled data alone does not ensure a better result on every target. CodeV+OriGen already reaches an average AUC of approximately 0.900 at \(t_c=100\), using 400 total samples. This exceeds the average AUC of each single-source configuration at \(t_c=400\), where 800 samples are available. This comparison supports the value of combining complementary training sources rather than merely increasing the volume from one source. At \(t_c=400\), CodeV+OriGen reaches 0.927 with 1,600 samples, a further improvement obtained at four times the labeling requirement. Together, these results favor a compact set of complementary detector features and suitably diverse training sources, while showing that additional features, sources, or samples should be judged by their effects on each target as well as on the aggregate score.
 
 \begin{comment}
 
@@ -463,7 +454,7 @@ ChipGPT-Llama2-7B   &  &  &  &  &  &  &  \\
 \bottomrule
 \end{tabular*}
 \end{table*}
-    
+
 \end{comment}
 
 

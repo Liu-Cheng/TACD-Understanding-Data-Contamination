@@ -60,6 +60,5 @@ Generated PDFs, auxiliary files, logs, and review images under `output/` are loc
 
 - Section V-A describes the ensemble threshold-selection procedure, but its final numerical threshold, search range, and step size still require confirmation from experiment records. The baseline threshold policy for these experiments also needs confirmation.
 - Some baseline results in Table III are blank in the current manuscript.
-- An existing reference to `sec:comparison` remains undefined and produces a compilation warning.
 
 These items should be checked against the experiment records before the manuscript is finalized.
