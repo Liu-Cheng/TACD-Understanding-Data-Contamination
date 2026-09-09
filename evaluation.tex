@@ -63,13 +63,11 @@ Boost Ensemble & \textbf{0.877} & \textbf{0.796} & \textbf{0.876} & \textbf{0.78
 \end{table*}
 
 
-We evaluate all methods on the three test sets constructed in Section~\ref{sec:golden_dataset}. Two primary metrics are reported: the area under the receiver operating characteristic curve (AUC-ROC) and the F1 score. AUC-ROC measures the overall ranking quality of contamination predictions across thresholds, while F1 reflects binary classification performance at the selected threshold \(\tau^*\). Higher values of both metrics indicate better detection performance.
+We compare the CatBoost ensemble with the ten individual detectors described in Section~\ref{sec:methods} on the golden test sets. The ensemble is trained on the combined training splits of CodeV and OriGen, using the data partitioning and hyperparameters specified in Sections~\ref{sec:golden_dataset} and~\ref{sec:catboost}. The RTLCoder data are excluded from ensemble training.
 
-We compare our CatBoost ensemble detector against the 10 individual methods described in Section~\ref{sec:methods}.This comparison is presented in Section~\ref{sec:comparison}.
+We report the area under the receiver operating characteristic curve (AUC-ROC) and the F1 score, treating contaminated samples as the positive class. AUC-ROC evaluates the ranking of continuous detector scores without fixing a decision threshold, whereas F1 evaluates binary predictions at the selected threshold. Higher values indicate better detection performance for both metrics.
 
-For ablation studies(Section~\ref{sec:ablation}), we systematically evaluate three design dimensions: (1) the choice of boosting algorithm (CatBoost~\cite{prokhorenkova2018catboost}, XGBoost~\cite{chen2016xgboost}, and LightGBM~\cite{ke2017lightgbm}), (2) method subset selection via greedy forward search, and (3) the impact of the composition and size of the training set. Except for the dimension under study, all ablation experiments share the identical training protocol and hyperparameter settings as described in Section~\ref{sec:catboost}.
-
-For benchmark contamination analysis, we apply the detector trained in Section~\ref{sec:detector} to the Verilog-generation models and benchmarks examined in Section~\ref{sec:detection}. We analyze the contamination status of each benchmark across different target models, and present a detailed analysis of the detection results in Section~\ref{sec:analysis}.
+For the ensemble, the decision threshold \(\tau^*\) is selected by five-fold stratified cross-validation on the combined CodeV and OriGen training splits. In each fold, the ensemble is fitted on four folds and produces contamination probabilities for the held-out fold. We select the threshold that maximizes the mean validation F1 across the five folds and use the decision rule \(\hat{y}=\mathbf{1}[p(x)\geq\tau^*]\). The selected threshold is fixed when evaluating the test sets and estimating benchmark contamination rates; test-set labels are not used for threshold selection.
 
 
 \subsection{Performance on Golden Test Sets}
