@@ -17,8 +17,8 @@ This repository contains the manuscript, bibliography, and figures. It does not 
 | `related.tex` | Related work |
 | `detection.tex` | Motivational study and boosting-based detector |
 | `evaluation.tex` | Experimental setup, results, benchmark analysis, and ablations |
-| `future.tex` | Future work |
-| `conclusion.tex` | Conclusion |
+| `future.tex` | Future-work paragraphs included at the end of the combined conclusion section |
+| `conclusion.tex` | Combined Conclusion and Future Work section; conclusion followed by `future.tex` |
 | `cite.bib` | Bibliography |
 | `figures/` | Figure assets used in the manuscript |
 | `photo/` | Additional image assets |
