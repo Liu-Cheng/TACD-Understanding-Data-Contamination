@@ -11,33 +11,6 @@
 
 \begin{table*}[t]
 \centering
-\caption{Contamination detection on DeepSeek-Coder-v1.5 variants: AUC-ROC and F1 comparison of individual detectors and the CatBoost ensemble on CodeV, RTLCoder, and OriGen.}
-\label{tab:compare_baseline}
-\small
-\begin{tabularx}{\textwidth}{l *{8}{>{\centering\arraybackslash}X}}
-\toprule
-& \multicolumn{2}{c}{\textbf{CodeV}} & \multicolumn{2}{c}{\textbf{RTLCoder}} & \multicolumn{2}{c}{\textbf{OriGen}} & \multicolumn{2}{c}{\textbf{Average}} \\
-\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9}
-\textbf{Method} & AUC & F1 & AUC & F1 & AUC & F1 & AUC & F1 \\
-\midrule
-Zlib  & 0.609 & 0.699 & 0.602 & 0.713 & 0.684 & 0.689 & 0.631 & 0.700 \\
-Min-K\%  & 0.756 & \uline{0.743} & 0.805 & \uline{0.776} & 0.813 & \uline{0.761} & 0.791 & \uline{0.760} \\
-Min-K\%++  & 0.649 & 0.682 & 0.794 & 0.755 & 0.547 & 0.674 & 0.663 & 0.703 \\
-DC-PDD  & \uline{0.818} & 0.658 & \uline{0.854} & 0.658 & \uline{0.878} & 0.678 & \uline{0.850} & 0.665 \\
-Perplexity  & 0.743 & \uline{0.743} & 0.794 & 0.757 & 0.819 & \uline{0.761} & 0.785 & 0.754 \\
-PETAL  & 0.681 & 0.664 & 0.808 & 0.658 & 0.794 & 0.658 & 0.761 & 0.660 \\
-Neighborhood  & 0.560 & 0.676 & 0.653 & 0.731 & 0.606 & 0.706 & 0.606 & 0.704 \\
-Reference  & 0.753 & 0.734 & 0.557 & 0.687 & 0.648 & 0.691 & 0.653 & 0.704 \\
-Token-Overlap  & 0.503 & 0.600 & 0.597 & 0.669 & 0.663 & 0.702 & 0.588 & 0.657 \\
-CDD & 0.707 & 0.177 & 0.582 & 0.451 & 0.783 & 0.718 & 0.690 & 0.448 \\
-Boost Ensemble & \textbf{0.917} & \textbf{0.859} & \textbf{0.912} & \textbf{0.859} & \textbf{0.951} & \textbf{0.899} & \textbf{0.927} & \textbf{0.872} \\
-\bottomrule
-\end{tabularx}
-\end{table*}
-
-
-\begin{table*}[t]
-\centering
 \caption{Cross-model generalization of contamination detection: AUC-ROC and F1 comparison of individual detectors and the CatBoost ensemble on HAVEN\_CodeLlama, HAVEN\_CodeQwen, and VeriCoder. The ensemble is trained on CodeV and OriGen without retraining on these target models.}
 \label{tab:HAVEN_VeriCoder}
 \small
@@ -126,7 +99,7 @@ Together, the two evaluations demonstrate improved detection effectiveness and s
 \subsection{Data Contamination in RTL Code-Generation Model Evaluation}
 \label{sec:analysis}
 
-We now use the validated ensemble to address the central empirical question of this work: how much potential training-data exposure affects the evaluation of current RTL code-generation models? Table~\ref{tab:benchmark_detection} reports estimated contamination rates for nine models on six benchmark variants. Each rate is the fraction of benchmark samples flagged for a particular target model. The overall summary is 52.0\%, obtained by averaging the models' sample-weighted rates across benchmarks. This aggregate indicates a substantial evaluation risk, but the variation across model--benchmark pairs is more informative about its possible origins and consequences.
+We use the validated ensemble to estimate the extent of data contamination in current RTL code-generation LLMs on representative evaluation benchmarks. This analysis documents potential contamination in current RTL model evaluation. Table~\ref{tab:benchmark_detection} reports estimated contamination rates for nine models on six benchmark variants. Each rate is the fraction of benchmark samples flagged for a particular target model. The overall summary is 52.0\%, obtained by averaging the models' sample-weighted rates across benchmarks. These estimates suggest that potential contamination is widespread in the evaluated settings, while the variation across model--benchmark pairs shows that its extent depends on both the model and the benchmark.
 
 \textbf{Training-data exposure can arise at multiple stages.}
 High estimates are not confined to RTL-specialized models: DeepSeek-Coder-6.7B and Qwen2.5-Coder reach weighted averages of 74.5\% and 58.2\%, respectively. In contrast, CodeGen-6B-Multi and Phi-2 yield only 0.2\% and 6.2\%. This contrast is consistent with differences in the coverage of public RTL sources by general code-training corpora, suggesting that benchmark exposure may already be inherited from a foundation model before RTL-specific fine-tuning. Among specialized models, RTLCoder and VeriGen reach 84.4\% and 79.1\%, whereas ChipGPT and OriGen yield 41.5\% and 56.7\%. Thus, specialization alone does not explain the ordering. Domain-specific training may introduce additional overlapping examples or reinforce memorization, but its effect depends on the underlying model, data sources, and filtering practices. These comparisons motivate auditing both pretraining exposure and fine-tuning data; they do not isolate the causal contribution of either stage without matched checkpoints and training records.
@@ -140,7 +113,7 @@ The averages for RealBench module- and system-level tasks are 14.4\% and 2.8\%, 
 \textbf{Contamination can confound model comparisons and apparent progress.}
 On VerilogEval v1, the estimates for RTLCoder and ChipGPT differ by 39.7 percentage points (97.4\% versus 57.7\%). Consequently, even a shared test set may mix prior exposure and generalization in different proportions for different models. A high aggregate pass rate could reflect strong performance on familiar designs while providing limited evidence about performance on new RTL tasks. The risk is particularly acute for model--benchmark pairs with near-saturated contamination estimates, where few samples remain unflagged. Conversely, a low estimated rate does not imply better generation ability. Contamination rates alone cannot quantify score inflation or determine whether a model ranking would change after controlling for exposure; this requires linking sample-level detection results to functional correctness.
 
-These findings motivate reporting contamination alongside generation performance for each model--benchmark pair. A useful next evaluation is to separate flagged and unflagged samples while accounting for task difficulty and the number of remaining samples. Since each model may have encountered different examples, filtering each model's test set independently can itself distort comparisons; a common audited subset or newly sourced tasks would provide a stronger basis for comparing generalization. The practical implication is that progress in RTL generation should be assessed jointly with training-data exposure, rather than inferred from benchmark pass rates alone.
+Overall, the estimates document widespread but uneven potential contamination across the evaluated model--benchmark pairs. This finding supports reporting contamination alongside generation performance. A useful next evaluation is to separate flagged and unflagged samples while accounting for task difficulty and the number of remaining samples. Since each model may have encountered different examples, filtering each model's test set independently can itself distort comparisons; a common audited subset or newly sourced tasks would provide a stronger basis for comparing generalization. The practical implication is that progress in RTL generation should be assessed jointly with training-data exposure, rather than inferred from benchmark pass rates alone.
 
 
 

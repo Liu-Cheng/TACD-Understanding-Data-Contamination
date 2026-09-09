@@ -262,6 +262,33 @@ We construct three golden datasets corresponding to three LLMs including \textbf
 
 \textbf{Dataset Split.} The 1,000-sample dataset for each model is split into an 800-sample training set and a 200-sample test set, both maintaining the 1:1 positive-to-negative ratio. Across all three models, this yields a total of 2,400 training samples and 600 test samples. The three test sets are used independently in Section~\ref{sec:evaluation} to evaluate both the individual methods and the proposed boosting ensemble.
 
+% Queue Table II before Section IV-C so that it appears at the top of page 6.
+\begin{table*}[t]
+\centering
+\caption{Contamination detection on DeepSeek-Coder-v1.5 variants: AUC-ROC and F1 comparison of individual detectors and the CatBoost ensemble on CodeV, RTLCoder, and OriGen.}
+\label{tab:compare_baseline}
+\small
+\begin{tabularx}{\textwidth}{l *{8}{>{\centering\arraybackslash}X}}
+\toprule
+& \multicolumn{2}{c}{\textbf{CodeV}} & \multicolumn{2}{c}{\textbf{RTLCoder}} & \multicolumn{2}{c}{\textbf{OriGen}} & \multicolumn{2}{c}{\textbf{Average}} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9}
+\textbf{Method} & AUC & F1 & AUC & F1 & AUC & F1 & AUC & F1 \\
+\midrule
+Zlib  & 0.609 & 0.699 & 0.602 & 0.713 & 0.684 & 0.689 & 0.631 & 0.700 \\
+Min-K\%  & 0.756 & \uline{0.743} & 0.805 & \uline{0.776} & 0.813 & \uline{0.761} & 0.791 & \uline{0.760} \\
+Min-K\%++  & 0.649 & 0.682 & 0.794 & 0.755 & 0.547 & 0.674 & 0.663 & 0.703 \\
+DC-PDD  & \uline{0.818} & 0.658 & \uline{0.854} & 0.658 & \uline{0.878} & 0.678 & \uline{0.850} & 0.665 \\
+Perplexity  & 0.743 & \uline{0.743} & 0.794 & 0.757 & 0.819 & \uline{0.761} & 0.785 & 0.754 \\
+PETAL  & 0.681 & 0.664 & 0.808 & 0.658 & 0.794 & 0.658 & 0.761 & 0.660 \\
+Neighborhood  & 0.560 & 0.676 & 0.653 & 0.731 & 0.606 & 0.706 & 0.606 & 0.704 \\
+Reference  & 0.753 & 0.734 & 0.557 & 0.687 & 0.648 & 0.691 & 0.653 & 0.704 \\
+Token-Overlap  & 0.503 & 0.600 & 0.597 & 0.669 & 0.663 & 0.702 & 0.588 & 0.657 \\
+CDD & 0.707 & 0.177 & 0.582 & 0.451 & 0.783 & 0.718 & 0.690 & 0.448 \\
+Boost Ensemble & \textbf{0.917} & \textbf{0.859} & \textbf{0.912} & \textbf{0.859} & \textbf{0.951} & \textbf{0.899} & \textbf{0.927} & \textbf{0.872} \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
 \subsection{CatBoost Ensemble Training}
 \label{sec:catboost}
 
@@ -274,7 +301,6 @@ We train the model on the combined training sets from \textbf{CodeV} and \textbf
 The decision threshold \(\tau^*\) is determined via 5-fold stratified cross-validation on the source training data, selecting the value that maximizes the average out-of-fold F1 score. This source-only calibration preserves the black-box deployment constraint: no target-model labels participate in threshold selection.
 
 The trained ensemble produces a contamination probability \(p(x)\) for each input, which is then converted to a binary prediction via \(\hat{y} = \mathbf{1}[p(x) \geq \tau^*]\).
-
 
 \begin{comment}
 
