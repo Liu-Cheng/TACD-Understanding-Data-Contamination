@@ -1,8 +1,0 @@
-\section{Conclusion and Future Work}
-\label{sec:conclusion}
-
-This paper investigated data contamination in the evaluation of RTL code-generation models. Existing detectors produce inconsistent estimates and identify different sets of potentially contaminated samples, motivating a controlled evaluation with known membership labels and an ensemble that combines complementary detection signals. The resulting CatBoost detector achieves an average AUC of 0.927 and F1 of 0.872 on DeepSeek-Coder-v1.5 variants, and an average AUC of 0.880 and F1 of 0.792 on additional RTL-generation models based on CodeLlama, CodeQwen, and Qwen. Its application to nine models and six benchmark variants yields an overall summary contamination estimate of 52.0\%, with substantial variation across model--benchmark pairs. These results demonstrate the value of combining detection signals and identify widespread potential training-data exposure in current RTL model evaluation.
-
-The broader implication is that benchmark scores must be interpreted together with a model's possible exposure to the evaluation data. Any publicly available design, specification, or implementation may be collected for training, while incomplete disclosure of training corpora often prevents direct verification of that exposure. Ignoring this uncertainty risks mistaking performance on familiar examples for the ability to solve new RTL tasks. It can also distort comparisons between models trained on different data and misdirect model development: changes that improve benchmark scores may be favored even when they do not improve generalization. Contamination-aware evaluation is therefore necessary both for assessing current capabilities and for guiding subsequent model iteration.
-
-\input{future}
